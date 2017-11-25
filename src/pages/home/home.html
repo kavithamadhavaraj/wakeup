@@ -9,13 +9,16 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-input type="text" id="destination" placeholder="Enter your destination" [(ngModel)]="destination" (keyup)="suggest($event)" clearInput></ion-input>
+    <ion-input start type="text" id="destination" placeholder="Enter your destination" [(ngModel)]="destination" (keyup)="suggest($event)" clearInput></ion-input>
+    <ion-buttons end>
+      <button (click)="findUserLocation()" ion-button icon-only><ion-icon name="locate"></ion-icon></button>  
+    </ion-buttons> 
   </ion-navbar>
 </ion-header>
 
 
 <ion-content padding>
-
-<div *ngIf="locationErrorInfo != null">{{locationErrorInfo}}</div>
-<div *ngIf="locationErrorInfo == null" id="map"></div>
+<ion-list>
+  <ion-item *ngFor="let favourite of favouriteList">{{favourite}}</ion-item>
+</ion-list>
 </ion-content>

@@ -14,46 +14,52 @@ declare let google: any;
   templateUrl: 'home.html',
 })
 export class HomePage {
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(private navCtrl: NavController, private navParams: NavParams) {
   
   }
-  destination: String;
+  destination: string;
   locationErrorInfo: string = null;
+  favouriteList: Array<string> = [];
 
   findUserLocation<Promise>(){
     return new Promise<any>((resolve,reject) => {
       if(!!navigator.geolocation) {
+        let self= this;
         navigator.geolocation.getCurrentPosition(function(position) {             
           let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          self.navCtrl.push("MapPage",{"pin":geolocation,"zoom":15})    
           resolve(geolocation);
         },function(error){  
             reject(error.message);
-        });      
+        },{ enableHighAccuracy: true, maximumAge: 100, timeout: 60000 }
+      );      
       } else {
         reject("GPS not supported");
       }
     })
   }
 
+  populateFavouriteList(){
+      this.favouriteList.push("DMR Residency");
+      this.favouriteList.push("Quadrisk Advisors");
+  }
 
   ionViewDidLoad() {
-      this.findUserLocation().then((pin)=>{
-        this.showMap(pin);
-      }).catch((error)=>{
-        this.locationErrorInfo = error;
-      });  
+      this.populateFavouriteList()
+      // let pin = new google.maps.LatLng(20.5937, 78.9629);
+      // this.showMap(pin, 5);
   }
 
   suggest(event_obj){
     let selectedPin = null;
-    let autocomplete = new google.maps.places.Autocomplete(event_obj.target, {types: ['geocode']});
+    let autocomplete = new google.maps.places.Autocomplete(event_obj.target, {});
     google.maps.event.addListener(autocomplete, 'place_changed', () => {      
       let place = autocomplete.getPlace();
       if(place.geometry){
         let latitude = place.geometry.location.lat();
         let longitude = place.geometry.location.lng();
         selectedPin = new google.maps.LatLng(latitude, longitude);
-        this.showMap(selectedPin);        
+        this.navCtrl.push("MapPage",{"pin":selectedPin,"zoom":15, "place":place.name})    
       }     
     });
     if((event_obj.keyCode == 13) && (selectedPin == null)){
@@ -63,18 +69,4 @@ export class HomePage {
       
   }
 
-  showMap(pin){
-    let options = {
-      center: pin,
-      zoom:15,
-      gestureHandling : "cooperative",
-      streetViewControl: false
-    }
-    let map = new google.maps.Map(document.getElementById("map"), options);
-    let marker = new google.maps.Marker({
-      position: pin,
-      map: map
-    });         
-    map.setCenter(pin);
-  }
 }
