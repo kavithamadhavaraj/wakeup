@@ -9,11 +9,13 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-input type="text" id="destination" placeholder="Enter your destination" [(ngModel)]="destination" (keyup)="suggest($event)" clearInput></ion-input>
   </ion-navbar>
 </ion-header>
 
 
 <ion-content padding>
-<div #map id="map"></div>
+
+<div *ngIf="locationErrorInfo != null">{{locationErrorInfo}}</div>
+<div *ngIf="locationErrorInfo == null" id="map"></div>
 </ion-content>
