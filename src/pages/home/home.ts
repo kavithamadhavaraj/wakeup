@@ -27,7 +27,7 @@ export class HomePage {
         let self= this;
         navigator.geolocation.getCurrentPosition(function(position) {             
           let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          self.navCtrl.push("MapPage",{"pin":geolocation,"zoom":15})    
+          self.navCtrl.push("MapPage",{"pin":geolocation,"home":geolocation});    
           resolve(geolocation);
         },function(error){  
             reject(error.message);
@@ -45,7 +45,8 @@ export class HomePage {
   }
 
   ionViewDidLoad() {
-      this.populateFavouriteList()
+      this.populateFavouriteList();
+      this.destination = "";
       // let pin = new google.maps.LatLng(20.5937, 78.9629);
       // this.showMap(pin, 5);
   }
@@ -59,7 +60,7 @@ export class HomePage {
         let latitude = place.geometry.location.lat();
         let longitude = place.geometry.location.lng();
         selectedPin = new google.maps.LatLng(latitude, longitude);
-        this.navCtrl.push("MapPage",{"pin":selectedPin,"zoom":15, "place":place.name})    
+        this.navCtrl.push("MapPage",{"pin":selectedPin})    
       }     
     });
     if((event_obj.keyCode == 13) && (selectedPin == null)){
