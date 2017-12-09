@@ -20,11 +20,21 @@ export class MapPage {
   geoCoder : any;
   map : any;
   autocomplete: any;
+  currentLocationMarker : any;
+  watchId: any;
   
   constructor(private navCtrl: NavController, private navParams: NavParams, private alertCtrl : AlertController) {
     this.geoCoder = new google.maps.Geocoder();
+    this.currentLocationMarker = new google.maps.Marker({
+      position: null,
+      map: null,
+      icon: "../../assets/icon/user_location.png"      
+    });
     
-    
+  }
+
+  startWatching(){
+    this.findUserLocation();    
   }
 
   setSearchBarData(pin){
@@ -34,37 +44,44 @@ export class MapPage {
     }
   }
 
-  findUserLocation<Promise>(){
-    return new Promise<any>((resolve,reject) => {
+  findUserLocation(){
+    if(this.watchId === undefined){
       if(!!navigator.geolocation) {
         let self= this;
-        navigator.geolocation.getCurrentPosition(function(position) {             
-          let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          resolve(geolocation);
+        this.watchId = navigator.geolocation.watchPosition(function(position) {             
+          self.showCurrentUserLocation(position);
         },function(error){  
-            reject(error.message);
-        },{ enableHighAccuracy: true, maximumAge: 100, timeout: 60000 }
-      );      
+            console.log("error in watch position");
+            
+        },{ enableHighAccuracy: true, maximumAge: 10, timeout: 60000 }
+      );
       } else {
-        reject("GPS not supported");
+        console.log("GPS not supported");
       }
-    })
+    }
   }
 
-  // setHome(home){
-  //   let marker = new google.maps.Marker({
-  //     position: home,
-  //     map: this.map,
-  //     icon: "../../assets/icon/current_location.png"      
-  //   });
-  // }
+  showCurrentUserLocation(position){
+    let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);   
+    this.map.setCenter(geolocation);
+    console.log("Watching position...");
+    console.log(geolocation);
+    this.currentLocationMarker.setMap(this.map);
+    this.currentLocationMarker.setPosition(geolocation);
+    if (google.maps.geometry.spherical.computeDistanceBetween(geolocation, this.fence.getCenter()) <= this.fence.getRadius()) {
+      alert("You have entered the region.. Wakeup..");
+      //TODO: VIBRATION AND NOTIFICATION
+    }
+    else{
+      console.log("Outside");
+    }
+  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad MapPage');
     let pin = this.navParams.get("pin");  
     this.setSearchBarData(pin);  
     this.showMap(pin);
-    //this.setHome(this.navParams.get("home"));
   }
 
   doGeocode(pin){
@@ -116,10 +133,8 @@ export class MapPage {
     let options = {
       center: pin,
       zoom: 15,
-      gestureHandling : "cooperative",
       streetViewControl: false
     }
-    console.log(document.getElementById("map"));
     this.map = new google.maps.Map(document.getElementById("map"), options);
     let marker = new google.maps.Marker({
       position: pin,
@@ -129,11 +144,12 @@ export class MapPage {
       icon: "../../assets/icon/locate.png"
     });
     marker.addListener('mouseup', function() {
-      console.log(marker);
       self.destination = marker.getPlace();
       self.map.setCenter(marker.getPosition());
       self.fence.setMap(null);
       self.createFence(self.map);
+      self.watchId = navigator.geolocation.clearWatch(self.watchId);
+      self.currentLocationMarker.setPosition(null);
       self.setSearchBarData(marker.getPosition());
     });
 
@@ -159,8 +175,9 @@ export class MapPage {
         }
       ]
     });
-    alarmModel.present();
+    
     this.map.setCenter(pin);
+    alarmModel.present();
   }
 
 }
