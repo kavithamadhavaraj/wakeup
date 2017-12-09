@@ -23,6 +23,7 @@ export class MapPage {
   currentLocationMarker : any;
   watchId: any;
   startWatch : boolean =  false;
+  entered: boolean=false;
   
   constructor(private navCtrl: NavController, private navParams: NavParams, private alertCtrl : AlertController) {
     this.geoCoder = new google.maps.Geocoder();
@@ -35,8 +36,7 @@ export class MapPage {
   }
 
   startOrStopWatching(){
-    this.startWatch = !this.startWatch;  
-    if(!this.startWatch)
+    if(this.startWatch)
       this.stopWatching();
     else
       this.findUserLocation(); 
@@ -44,6 +44,7 @@ export class MapPage {
   }
 
   stopWatching(){
+    this.startWatch = false;
     this.watchId = navigator.geolocation.clearWatch(this.watchId);
     this.currentLocationMarker.setPosition(null);
     this.map.setCenter(this.navParams.get("pin"));
@@ -57,6 +58,8 @@ export class MapPage {
   }
 
   findUserLocation(){
+    this.startWatch = true;
+    this.entered = false;
     if(this.watchId === undefined){
       if(!!navigator.geolocation) {
         let self= this;
@@ -72,6 +75,20 @@ export class MapPage {
     }
   }
 
+  startVibration(){
+    let pattern = []
+    for(var i = 0;i < 20; i++){
+      pattern.push(2000);
+      pattern.push(100)
+    }
+    navigator.vibrate(pattern);
+  }
+
+  stopVibration(){
+    navigator.vibrate(0);
+    this.stopWatching();
+  }
+
   showCurrentUserLocation(position){
     let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);   
     this.map.setCenter(geolocation);
@@ -79,9 +96,22 @@ export class MapPage {
     console.log(geolocation);
     this.currentLocationMarker.setMap(this.map);
     this.currentLocationMarker.setPosition(geolocation);
-    if (google.maps.geometry.spherical.computeDistanceBetween(geolocation, this.fence.getCenter()) <= this.fence.getRadius()) {
-      alert("You have entered the region.. Wakeup..");
-      //TODO: VIBRATION AND NOTIFICATION
+    if((this.entered == false) && (google.maps.geometry.spherical.computeDistanceBetween(geolocation, this.fence.getCenter()) <= this.fence.getRadius())) {
+      this.entered = true;
+      this.startVibration();
+      let alarmModel = this.alertCtrl.create({
+      title: "Wakeup Alarm",
+      enableBackdropDismiss:false,
+      message:"You are about to reach your location. ",
+      buttons: [
+        {
+          text: 'Dismiss Alarm',
+          handler: data => {
+            this.stopVibration();
+          }
+        }
+      ]
+    }).present();
     }
     else{
       console.log("Outside");
@@ -160,6 +190,7 @@ export class MapPage {
       self.fence.setMap(null);
       self.createFence(self.map);
       self.stopWatching();
+      self.startWatch = false;
       self.setSearchBarData(marker.getPosition());
     });
 
