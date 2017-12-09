@@ -22,6 +22,7 @@ export class MapPage {
   autocomplete: any;
   currentLocationMarker : any;
   watchId: any;
+  startWatch : boolean =  false;
   
   constructor(private navCtrl: NavController, private navParams: NavParams, private alertCtrl : AlertController) {
     this.geoCoder = new google.maps.Geocoder();
@@ -33,8 +34,19 @@ export class MapPage {
     
   }
 
-  startWatching(){
-    this.findUserLocation();    
+  startOrStopWatching(){
+    this.startWatch = !this.startWatch;  
+    if(!this.startWatch)
+      this.stopWatching();
+    else
+      this.findUserLocation(); 
+     
+  }
+
+  stopWatching(){
+    this.watchId = navigator.geolocation.clearWatch(this.watchId);
+    this.currentLocationMarker.setPosition(null);
+    this.map.setCenter(this.navParams.get("pin"));
   }
 
   setSearchBarData(pin){
@@ -52,8 +64,7 @@ export class MapPage {
           self.showCurrentUserLocation(position);
         },function(error){  
             console.log("error in watch position");
-            
-        },{ enableHighAccuracy: true, maximumAge: 10, timeout: 60000 }
+        },{ enableHighAccuracy: true, maximumAge: 100, timeout: 60000 }
       );
       } else {
         console.log("GPS not supported");
@@ -148,8 +159,7 @@ export class MapPage {
       self.map.setCenter(marker.getPosition());
       self.fence.setMap(null);
       self.createFence(self.map);
-      self.watchId = navigator.geolocation.clearWatch(self.watchId);
-      self.currentLocationMarker.setPosition(null);
+      self.stopWatching();
       self.setSearchBarData(marker.getPosition());
     });
 

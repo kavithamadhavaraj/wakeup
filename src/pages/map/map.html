@@ -15,6 +15,6 @@
 
 
 <ion-content padding>
-  <button class="start" (click)='startWatching()'> Start </button>
+  <button class="start" (click)='startOrStopWatching()'> {{(startWatch)? "Stop":"Start"}} </button>
   <div id="map"></div>
 </ion-content>
