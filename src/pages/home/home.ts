@@ -19,7 +19,7 @@ export class HomePage {
   }
   destination: string;
   locationErrorInfo: string = null;
-  favouriteList: Array<string> = [];
+  favouriteList: Array<Object> = [];
 
   findUserLocation<Promise>(){
     return new Promise<any>((resolve,reject) => {
@@ -27,7 +27,7 @@ export class HomePage {
         let self= this;
         navigator.geolocation.getCurrentPosition(function(position) {             
           let geolocation:any = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          self.navCtrl.push("MapPage",{"pin":geolocation,"home":geolocation});    
+          self.navCtrl.push("MapPage",{"pin":geolocation});    
           resolve(geolocation);
         },function(error){  
             reject(error.message);
@@ -38,17 +38,26 @@ export class HomePage {
       }
     })
   }
+  goToFavourite(pin){
+    this.navCtrl.push("MapPage",{"pin":pin});    
+  }
 
   populateFavouriteList(){
-      this.favouriteList.push("DMR Residency");
-      this.favouriteList.push("Quadrisk Advisors");
+    for(var key in localStorage) {
+      if (!key.startsWith("ionic")){
+        console.log({key:JSON.parse(localStorage.getItem(key))});        
+        this.favouriteList.push({"name":key, "data":JSON.parse(localStorage.getItem(key))});
+      }
+    }
+    if (this.favouriteList.length == 0){
+        this.favouriteList.push({"name":"Your favourite area is empty :("});
+    }
+    console.log(this.favouriteList);
   }
 
   ionViewDidLoad() {
       this.populateFavouriteList();
       this.destination = "";
-      // let pin = new google.maps.LatLng(20.5937, 78.9629);
-      // this.showMap(pin, 5);
   }
 
   suggest(event_obj){

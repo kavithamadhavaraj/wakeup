@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 declare let google:any;
 /**
  * Generated class for the MapPage page.
@@ -25,7 +25,7 @@ export class MapPage {
   startWatch : boolean =  false;
   entered: boolean=false;
   
-  constructor(private navCtrl: NavController, private navParams: NavParams, private alertCtrl : AlertController) {
+  constructor(private navCtrl: NavController, private navParams: NavParams, private toastCtrl : ToastController, private alertCtrl : AlertController) {
     this.geoCoder = new google.maps.Geocoder();
     this.currentLocationMarker = new google.maps.Marker({
       position: null,
@@ -55,6 +55,46 @@ export class MapPage {
     if(pin){
       this.doGeocode(pin).then((data) =>{ self.destination = data; });
     }
+  }
+
+  addToFavourites(){
+    console.log("Adding to favourites..");
+    let alarmModel = this.alertCtrl.create({
+      title: "Mark this location as your favourite",
+      message:"Location Name",
+      inputs: [
+        {
+          name: "nick_name",
+          placeholder: "Home",
+          type: 'text',
+          value:"Home"
+        }
+      ],
+      buttons: [
+        {
+          text: 'Save',
+          handler: data => {
+            console.log(data.nick_name);
+            if (localStorage.getItem(data.nick_name) == undefined){           
+              localStorage.setItem(data.nick_name, JSON.stringify({'pin': this.navParams.get("pin"), "address": this.destination}));
+              let toast = this.toastCtrl.create({
+                message: "Added successfully.",
+                duration: 3000,
+                position: 'top'
+              }).present();
+            }
+            else{
+              let toast = this.toastCtrl.create({
+                message: "This name is already taken. Choose another to add to favourites.",
+                duration: 3000,
+                position: 'top'
+              }).present();
+              return false;
+            }
+          }
+        }
+      ]
+    }).present();    
   }
 
   findUserLocation(){

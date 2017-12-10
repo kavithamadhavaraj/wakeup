@@ -19,6 +19,8 @@
 
 <ion-content padding>
 <ion-list>
-  <ion-item *ngFor="let favourite of favouriteList">{{favourite}}</ion-item>
+  <ion-item class="list_item" *ngFor="let favourite of favouriteList" (click)=goToFavourite(favourite.data.pin)>    
+    <h2>{{favourite.name}}</h2> <p>{{favourite.data.address}}</p>
+  </ion-item>
 </ion-list>
 </ion-content>
