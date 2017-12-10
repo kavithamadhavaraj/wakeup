@@ -22,6 +22,7 @@ export class MyApp {
     this.pages = [
      
       { title: 'Home', component: "HomePage" },
+      { title: 'Edit Favourites', component: "EditfavouritePage" }
     ];
 
   }

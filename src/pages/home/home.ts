@@ -43,19 +43,18 @@ export class HomePage {
   }
 
   populateFavouriteList(){
+    this.favouriteList = [];
     for(var key in localStorage) {
       if (!key.startsWith("ionic")){
-        console.log({key:JSON.parse(localStorage.getItem(key))});        
         this.favouriteList.push({"name":key, "data":JSON.parse(localStorage.getItem(key))});
       }
     }
     if (this.favouriteList.length == 0){
         this.favouriteList.push({"name":"Your favourite area is empty :("});
     }
-    console.log(this.favouriteList);
   }
 
-  ionViewDidLoad() {
+  ionViewWillEnter() {      
       this.populateFavouriteList();
       this.destination = "";
   }
