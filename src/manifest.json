@@ -1,6 +1,6 @@
 {
-  "name": "WakeUp",
-  "short_name": "WakeUp",
+  "name": "WakeUp1",
+  "short_name": "WakeUp1",
   "start_url": "index.html",
   "display": "standalone",
   "icons": [{
@@ -9,5 +9,5 @@
     "type": "image/png"
   }],
   "background_color": "#FFAE00",
-  "theme_color": "#FFAE00"
+  "theme_color": "#FF3454"
 }
