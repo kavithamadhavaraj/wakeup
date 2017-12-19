@@ -44,11 +44,9 @@ export class HomePage {
 
   populateFavouriteList(){
     this.favouriteList = [];
-    for(var key in localStorage) {
-      if (!key.startsWith("ionic")){
-        this.favouriteList.push({"name":key, "data":JSON.parse(localStorage.getItem(key))});
-      }
-    }
+    for (var i = 0; i < localStorage.length; i++){
+      this.favouriteList.push({"name":localStorage.key(i), "data":JSON.parse(localStorage.getItem(localStorage.key(i)))});
+    }    
     if (this.favouriteList.length == 0){
         this.favouriteList.push({"name":"Your favourite area is empty :("});
     }

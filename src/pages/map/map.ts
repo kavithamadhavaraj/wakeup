@@ -15,7 +15,7 @@ declare let google:any;
 })
 export class MapPage {
   destination: string;
-  radius: number;
+  radius: number = 500;
   fence : any;
   geoCoder : any;
   map : any;
@@ -60,8 +60,7 @@ export class MapPage {
   addToFavourites(){
     console.log("Adding to favourites..");
     let alarmModel = this.alertCtrl.create({
-      title: "Mark this location as your favourite",
-      message:"Location Name",
+      title: "Favourite this location",
       inputs: [
         {
           name: "nick_name",
@@ -236,7 +235,7 @@ export class MapPage {
 
     let alarmModel = this.alertCtrl.create({
       title: "Create an alarm",
-      enableBackdropDismiss:false,
+      enableBackdropDismiss:true,
       message:"Enter radius (mts) to activate",
       inputs: [
         {
@@ -251,10 +250,12 @@ export class MapPage {
           text: 'Save',
           handler: data => {
             this.radius = data.radius;
-            this.createFence(this.map);
           }
         }
       ]
+    });    
+    alarmModel.onWillDismiss(() => {
+      this.createFence(this.map);
     });
     
     this.map.setCenter(pin);

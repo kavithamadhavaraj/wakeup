@@ -46,29 +46,6 @@ export class EditfavouritePage {
         ],
         buttons: [
           {
-            text: 'Save',
-            handler: data => {
-              if (localStorage.getItem(data.nick_name) == undefined){           
-                localStorage.setItem(data.nick_name, localStorage.getItem(name));
-                localStorage.removeItem(name);
-                let toast = this.toastCtrl.create({
-                  message: "Updated successfully.",
-                  duration: 3000,
-                  position: 'top'
-                }).present();
-                this.populateFavouriteList();
-              }
-              else{
-                let toast = this.toastCtrl.create({
-                  message: "This name is already taken. Choose another to add to favourites.",
-                  duration: 3000,
-                  position: 'top'
-                }).present();
-                return false;
-              }
-            }
-          },
-          {
             text: 'Delete',
             handler: data => {
               if (localStorage.getItem(data.nick_name)){           
@@ -90,6 +67,28 @@ export class EditfavouritePage {
                 return false;
               }
             }
+          },{
+            text: 'Save',
+            handler: data => {
+              if (localStorage.getItem(data.nick_name) == undefined){           
+                localStorage.setItem(data.nick_name, localStorage.getItem(name));
+                localStorage.removeItem(name);
+                let toast = this.toastCtrl.create({
+                  message: "Updated successfully.",
+                  duration: 3000,
+                  position: 'top'
+                }).present();
+                this.populateFavouriteList();
+              }
+              else{
+                let toast = this.toastCtrl.create({
+                  message: "This name is already taken. Choose another to add to favourites.",
+                  duration: 3000,
+                  position: 'top'
+                }).present();
+                return false;
+              }
+            }
           }
         ]
       }).present(); 
@@ -98,11 +97,12 @@ export class EditfavouritePage {
   }
 
   populateFavouriteList(){
-    this.favouriteList = []
-    for(var key in localStorage) {
-      if (!key.startsWith("ionic")){
-        this.favouriteList.push({"name":key, "data":JSON.parse(localStorage.getItem(key))});
-      }
+    this.favouriteList = [];
+    for (var i = 0; i < localStorage.length; i++){
+      this.favouriteList.push({"name":localStorage.key(i), "data":JSON.parse(localStorage.getItem(localStorage.key(i)))});
+    }    
+    if (this.favouriteList.length == 0){
+        this.favouriteList.push({"name":"Your favourite area is empty :("});
     }
   }
   
