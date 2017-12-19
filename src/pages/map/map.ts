@@ -8,7 +8,9 @@ declare let google:any;
  * Ionic pages and navigation.
  */
 
-@IonicPage()
+@IonicPage({
+  segment: "map"
+})
 @Component({
   selector: 'page-map',
   templateUrl: 'map.html',
@@ -160,8 +162,13 @@ export class MapPage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad MapPage');
     let pin = this.navParams.get("pin");  
-    this.setSearchBarData(pin);  
-    this.showMap(pin);
+    console.log(pin);
+    if(pin != undefined){
+      this.setSearchBarData(pin);  
+      this.showMap(pin);
+    }
+    else
+      this.navCtrl.setRoot("HomePage");
   }
 
   doGeocode(pin){

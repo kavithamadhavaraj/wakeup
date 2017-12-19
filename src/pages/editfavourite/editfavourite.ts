@@ -8,7 +8,9 @@ import { IonicPage, NavController, NavParams, ToastController, AlertController }
  * Ionic pages and navigation.
  */
 
-@IonicPage()
+@IonicPage({
+  segment: "edit"
+})
 @Component({
   selector: 'page-editfavourite',
   templateUrl: 'editfavourite.html',
@@ -99,6 +101,7 @@ export class EditfavouritePage {
   populateFavouriteList(){
     this.favouriteList = [];
     for (var i = 0; i < localStorage.length; i++){
+      if(localStorage.key(i).indexOf("ionic") == -1)
       this.favouriteList.push({"name":localStorage.key(i), "data":JSON.parse(localStorage.getItem(localStorage.key(i)))});
     }    
     if (this.favouriteList.length == 0){

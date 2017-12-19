@@ -8,7 +8,9 @@ declare let google: any;
  * Ionic pages and navigation.
  */
 
-@IonicPage()
+@IonicPage({
+  segment: "home"
+})
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
@@ -45,6 +47,7 @@ export class HomePage {
   populateFavouriteList(){
     this.favouriteList = [];
     for (var i = 0; i < localStorage.length; i++){
+      if(localStorage.key(i).indexOf("ionic") == -1)
       this.favouriteList.push({"name":localStorage.key(i), "data":JSON.parse(localStorage.getItem(localStorage.key(i)))});
     }    
     if (this.favouriteList.length == 0){
